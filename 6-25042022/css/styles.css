@@ -61,3 +61,8 @@ h2 {
   border-radius: 0px;
   z-index: 10000;
 }
+h1 {
+  font-family: arial;
+  text-align: center;
+  margin: 30px;
+}
