@@ -16,4 +16,4 @@ function makeup(){
         saida+="</div>";
         document.body.innerHTML = saida;
     })
-}
+} 
