@@ -23,11 +23,17 @@ const express = require(`express`);
 //importação no modulo mongoose
 const mongoose = require("mongoose");
 
+//importação no modulo do cors
+const cors = require("cors");
+
 //criação do app referente ao express
 const app = express();
 
 //preparar o servidor para receber json
 app.use(express.json());
+
+//Uso do cors para desbloqueio de acesso
+app.use(cors());
 
 
 /*
@@ -56,7 +62,16 @@ const default_route = "/api/cliente";
 
 //rota para listar os clientes com endpoint listar
 app.get(`${default_route}/listar` ,(req, res)=>{
-    res.status(200).send({ output:`Rota GET`});
+    Cliente.find().then((dados)=>{
+        
+        res.status(200).send({ output:dados});
+    })
+  .catch((erro)=>res
+    .status(500)
+    .send({ output:`Erro interno
+    ao processar consulta -> ${erro}`})
+  );
+    
 });
 
 //rota para cadastrar os clientes com endpoint cadastrar
@@ -72,13 +87,27 @@ app.post(`${default_route}/cadastrar` ,(req, res)=>{
 //rota para atualizar com endpoint atualizar
 //passagem de argumentos pela url com o id do cliente
 app.put(`${default_route}/atualizar/:id` ,(req, res)=>{
-    res.status(200).send({ output: req.params.id});
+    
+    Cliente.findByIdAndUpdate(req.params.id,req.body,{new:true},(erro,dados) =>{
+        if(erro){
+            return res.status(500).
+            send({output:`Não atualizaou -> ${erro}`});
+        }
+        res.status(200).send({ output:"Dados atualizados"});
+    })
 });
 //rota para apagar cliente com endpoint deletar
 app.delete(`${default_route}/apagar/:id` , (req, res)=>{
-    res.status(204).send({ output: req.params.id });
+    Cliente.findByIdAndDelete(req.params.id, (erro,dados) =>{
+        if(erro){
+            return res
+            .status(500)
+            .send({ output: `Erro ao tentar apagar -> ${erro}`});
+        }
+        res.status(204).send({ output: `Excluido` });
+    });
 });
 
 //definir a porta de comunicação do servidor
-app.listen(5000,
-    ()=>console.log("Servidor on-line em http://localhost:5000"))
+app.listen(5000, ()=> 
+console.log("Servidor on-line em http://localhost:5000"))
